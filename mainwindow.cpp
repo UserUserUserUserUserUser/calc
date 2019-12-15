@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QVBoxLayout *pMainLayout = new QVBoxLayout();
     pMainWidget->setLayout( pMainLayout );
-    pMainLayout->addLayout(  createHeaderLayout() );
+    pMainLayout->addLayout( createHeaderLayout() );
     pMainLayout->addLayout( createInOutLayout() );
     pMainLayout->addLayout( createKeypadLayout() );
 }
@@ -65,23 +65,32 @@ QLayout *MainWindow::createLineEditLayout()
 QLayout *MainWindow::createChoiceLayout()
 {
     QStringList numberSystem;
-    numberSystem << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10" << "11" << "12" << "13" << "14" << "15" << "16";
-    QComboBox *comboBox1 = new QComboBox();
-    comboBox1->addItems( numberSystem );
-    QComboBox *comboBox2 = new QComboBox();
-    comboBox2->addItems( numberSystem );
+//    numberSystem << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10";   // << "11" << "12" << "13" << "14" << "15" << "16";
+    numberSystem << "2" << "8" << "10";
 
-    QPixmap pix;
-    QLabel *pPix = new QLabel();
+    QComboBox *pComboBox1 = new QComboBox();
+    pComboBox1->addItems( numberSystem );
+    m_SS1 = pComboBox1->currentText().toInt();
 
-    if (pix.load(":/pixes/pix1.png"))
-        pPix->setPixmap(pix);
-    qWarning() << "Беда. Картинка не загрузилась ((";
+    connect(pComboBox1, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), this, &MainWindow::slotSS1);
+
+    QComboBox *pComboBox2 = new QComboBox();
+    pComboBox2->addItems( numberSystem );
+    m_SS2 = pComboBox2->currentText().toInt();
+
+    connect(pComboBox2, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), this, &MainWindow::slotSS2);
+
+//    QPixmap pix;
+//    QLabel *pPix = new QLabel();
+
+//    if (pix.load(":/pixes/pix1.png"))
+//        pPix->setPixmap(pix);
+//    qWarning() << "Беда. Картинка не загрузилась ((";
 
     QHBoxLayout *pChoiceLayout = new QHBoxLayout();
-    pChoiceLayout->addWidget( comboBox1 );
-    pChoiceLayout->addWidget( pPix );
-    pChoiceLayout->addWidget( comboBox2 );
+    pChoiceLayout->addWidget( pComboBox1 );
+//    pChoiceLayout->addWidget( pPix );
+    pChoiceLayout->addWidget( pComboBox2 );
 
     return pChoiceLayout;
 }
@@ -98,7 +107,7 @@ QLayout *MainWindow::createKeypadLayout()
     QGridLayout *pKeypadLayout = new QGridLayout;
     QPushButton *pCE = new QPushButton("CE");
     connect(pCE, &QPushButton::clicked, this, &MainWindow::slotCE);
-    QPushButton *pDel = new QPushButton("delete");
+    QPushButton *pDel = new QPushButton("del");
     connect(pDel, &QPushButton::clicked, this, &MainWindow::slotNumDel);
 
     pKeypadLayout->addWidget( m_pAnswer, 0,0 );
@@ -114,11 +123,21 @@ QLayout *MainWindow::createKeypadLayout()
     return pKeypadLayout;
 }
 
+
+
+
+
 void MainWindow::slotEnter()
 {
-    QString text = m_pLine->text();
-    int inputNumber = text.toInt();
-    qDebug() << "numer + 1: " << inputNumber + 1;
+    QString numberStr = m_pLine->text();
+
+    bool ok;
+    auto number{ numberStr.toInt(&ok, m_SS1) };
+
+    if( ok )
+        m_pAnswer->setText( QString::number(number, m_SS2) );
+    else
+       qWarning() << "slotEnter Ошибка приведения типа к int";
 }
 
 void MainWindow::slotNumber()
@@ -141,4 +160,15 @@ void MainWindow::slotCE()
     m_pLine->setText("");
 }
 
-// добавить кнопку "очистить все", возможность работы с дробями
+void MainWindow::slotSS1(const QString &text)
+{
+    m_SS1 = text.toInt();
+}
+
+void MainWindow::slotSS2(const QString &text)
+{
+    m_SS2 = text.toInt();
+}
+
+
+// возможность работы с дробями ;  показывать решение

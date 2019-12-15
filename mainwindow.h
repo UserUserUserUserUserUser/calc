@@ -1,15 +1,16 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QLayout>
-#include <QLabel>
-#include <QtDebug>
-#include <QLineEdit>
-#include <QPushButton>
 #include <QComboBox>
+#include <QLabel>
+#include <QLayout>
+#include <QLineEdit>
+#include <QMainWindow>
+#include <QPushButton>
 #include <QPixmap>
 #include <QPushButton>
+#include <QString>
+#include <QtDebug>
 
 
 class MainWindow : public QMainWindow
@@ -20,6 +21,7 @@ class MainWindow : public QMainWindow
     QLabel *m_pAnswer = new QLabel("тут будет ответ");
 
     int m_SS1 = 0;
+    int m_SS2 = 0;
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -36,11 +38,16 @@ private:
     QLayout *createKeypadLayout();
 
 
+
 private slots:
-    void slotEnter();
+    void slotEnter();    
     void slotNumber();
     void slotNumDel();
     void slotCE();
+    void slotSS1(const QString &text);
+    void slotSS2(const QString &text);
+
+
 
 
 };
